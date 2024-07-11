@@ -15,6 +15,16 @@ int extractNumber(const std::string& name) {
     return INT_MAX; // If no number is found, return a large number
 }
 
+// Comparator function for sorting
+bool compareNames(const std::string& a, const std::string& b) {
+    int numA = extractNumber(a);
+    int numB = extractNumber(b);
+    if (numA == numB) {
+        return a < b; // If numbers are the same, sort lexicographically
+    }
+    return numA < numB;
+}
+
 int main() {
     std::ifstream inputFile("input.txt");
     std::ofstream outputFile("sorted_output.txt");
@@ -38,9 +48,7 @@ int main() {
     }
 
     // Sort the names based on the number at the end
-    std::sort(names.begin(), names.end(), [](const std::string& a, const std::string& b) {
-        return extractNumber(a) < extractNumber(b);
-    });
+    std::sort(names.begin(), names.end(), compareNames);
 
     // Write the sorted names to the output file
     for (const auto& name : names) {
