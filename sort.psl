@@ -1,0 +1,52 @@
+# Function to extract the number at the end of the string
+function Extract-Number {
+    param (
+        [string]$name
+    )
+    $match = [regex]::Match($name, '(\d+)$')
+    if ($match.Success) {
+        return [int]$match.Value
+    }
+    return [int]::MaxValue # If no number is found, return a large number
+}
+
+# Comparator function for sorting
+function Compare-Names {
+    param (
+        [string]$a,
+        [string]$b
+    )
+    $numA = Extract-Number $a
+    $numB = Extract-Number $b
+    if ($numA -eq $numB) {
+        return [string]::Compare($a, $b)
+    }
+    return $numA - $numB
+}
+
+# Main script
+$inputFile = "input.txt"
+$outputFile = "sorted_output.txt"
+
+if (-Not (Test-Path $inputFile)) {
+    Write-Error "Error opening input file"
+    exit 1
+}
+
+try {
+    $names = Get-Content $inputFile
+} catch {
+    Write-Error "Error reading input file"
+    exit 1
+}
+
+$sortedNames = $names | Sort-Object -Property { $_ } -Descending | Sort-Object -Property { Extract-Number $_ }, { $_ }
+
+try {
+    $sortedNames | Out-File $outputFile -Encoding UTF8
+} catch {
+    Write-Error "Error writing to output file"
+    exit 1
+}
+
+Write-Output "Sorting completed. Check '$outputFile' for the sorted names."
